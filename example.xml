@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+
+<!-- ModDesc Example -->
+<modDesc descVersion="94">
+    <extraSourceFiles>
+        <!-- Optional Animation Node Extensions: Only add if required in the factory!  All available on GtX GitHub
+             https://github.com/GtX-Andy/FS25_AnimationNodes
+        -->
+        <sourceFile filename="scripts/animations/BeaconLightAnimation.lua"/>
+        <sourceFile filename="scripts/animations/AnimatedPartAnimation.lua"/>
+
+        <!-- Optional Effect Extensions: Only add if required in the factory!  All available on GtX GitHub
+             https://github.com/GtX-Andy/FS25_EffectNodes
+        -->
+        <sourceFile filename="scripts/effects/SequencedPipeEffect.lua"/>
+        <sourceFile filename="scripts/effects/SequencedParticleEffect.lua"/>
+        <sourceFile filename="scripts/effects/SequencedShaderPlaneEffect.lua"/>
+        <sourceFile filename="scripts/effects/SequencedMorphPositionEffect.lua"/>
+    </extraSourceFiles>
+
+    <!-- Required only when using </animalInput> feature. -->
+    <l10n>
+        <text name="message_unloadAnimalSuccess">
+            <en>Animals were successfully moved to %s!</en>
+            <de>Tiere wurden erfolgreich nach %s entladen!</de>
+        </text>
+        <text name="message_unloadAnimalConfirmation">
+            <en>Do you want to move %d animals (%s) to the %s?</en>
+            <de>Möchten Sie %d Tiere (%s) nach %s entladen?</de>
+        </text>
+        <text name="button_moveAnimal">
+            <en>Move to %s</en>
+            <de>Nach %s entladen</de>
+        </text>
+
+         <!-- Only required when a 'minimumAge' is set as part of the </animalInput> -->
+        <text name="message_animalTooYoung">
+            <en>This animal is too young, a minimum age of %s will be accepted!</en>
+            <de>Dieses Tier ist zu jung, ein Mindestalter von %s wird akzeptiert!</de>
+        </text>
+
+        <!-- Only required when a 'maximumAge' is set as part of the </animalInput> -->
+        <text name="message_animalTooOld">
+            <en>This animal is too old, a maximum age of %s will be accepted!</en>
+            <de>Dieses Tier ist zu alt, ein Höchstalter von %s wird akzeptiert!</de>
+        </text>
+    </l10n>
+
+    <placeableTypes>
+        <!-- Required: Register the placeable type -->
+        <type name="extendedProductionPoint" parent="simplePlaceable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua" >
+            <specialization name="extendedProductionPoint"/>
+            <specialization name="infoTrigger" />
+        </type>
+    </placeableTypes>
+
+    <placeableSpecializations>
+        <!-- Required: Add specialization -->
+        <specialization name="extendedProductionPoint" className="PlaceableExtendedProductionPoint" filename="scripts/PlaceableExtendedProductionPoint.lua"/>
+    </placeableSpecializations>
+</modDesc>
+
+
+<!-- Placeable Example -->
+<placeable type="extendedProductionPoint">
+    <extendedProductionPoint name="unnamed production point">
+        <!-- Text displays to show the 'name' (unnamed production point). 'AUTO_MASK' can be used in 'mask' area so it adjust to text length
+            'upperCase' can be used if all capital letters is required
+
+            NOTE: Not all characters are available in the base game 'FONTS' such as special characters used in some languages.
+                  If required you will need to first create your own custom 'FONT' or these will be displayed as blank spaces!
+        -->
+        <factoryNameDisplays>
+            <display alignment="string" color="0.9 0.9 0.9 1" emissiveScale="0.2" font="string" hiddenColor="r g b" mask="0000000" node="node" scaleX="1" scaleY="1" size="0.03" upperCase="false"/>
+        </factoryNameDisplays>
+
+        <!-- type: This is the animalType name. All subTyps will be accepted -->
+
+        <!-- fillType: This is the fillType that the animalType will be converted to.
+            Note: this fillType must be added to the 'unloadTrigger' and 'storage' using 'PIG_INPUT' for example will correctly handle icon and name. -->
+        <animalInput moveButtonText="l10n_string" triggerNode="node" unloadConfirmationText="$l10n_message_unloadAnimalConfirmation" unloadSuccessText="$l10n_message_unloadAnimalSuccess" moveButtonText="$l10n_button_moveAnimal" animalMinimumAgeText="$l10n_message_animalTooYoung" animalMaximumAgeText="$l10n_message_animalTooOld">
+            <!-- NOTE: minimumAge and maximumAge are optional and removing these keys or setting minimumAge to 0 and maximumAge to 60 will allow any animal age to be delivered..
+                       60 is the maximum age of an animal in FS/LS25.
+
+                      While it is possible to just use PIG_LANDRACE to allow pigs to be delivered a better result can be achieved by creating a new fillType for your mod or map.
+                      By adding each animal type you require as a new input you will be able to deliver all pig types for example and the correct title for GUI will be shown (i.e Pig) rather than a breed type name.
+
+                     Example for FillTypes.xml loaded via modDesc.xml
+
+                     <map>
+                        <fillTypes>
+                            <fillType name="PIG_INPUT" title="$l10n_ui_statisticView_pig" showOnPriceTable="false">
+                                <physics massPerLiter ="120.0" maxPhysicalSurfaceAngle="0" />
+                                <economy pricePerLiter="3000" />
+                                <image hud="$dataS/menu/hud/fillTypes/hud_fill_pig.png" />
+                            </fillType>
+                        </fillTypes>
+                     </map>
+            -->
+            <animal type="PIG" fillType="PIG_INPUT" minimumAge="6" maximumAge="60"/>
+        </animalInput>
+
+        <!-- Collect rainwater and snow. Only when 'WATER' fill type is available -->
+        <rainWaterCollector collectSnow="false" rainWaterPerMinute="0"/>
+
+        <!-- No changes -->
+        <playerTrigger node="node"/>
+
+        <!-- NOTE: 'alwaysActive' is set to TRUE when using 'activeSeasons' or 'activeHours'.
+                    This will hide the activate / deactivate button from the GUI as a production with operating times or seasons has no need to be manually adjusted.
+        -->
+        <operatingConditions alwaysActive="false">
+            <!-- Options: SPRING SUMMER AUTUMN WINTER
+                 A maximum of 3 seasons is required.
+            -->
+            <activeSeasons seasons="SPRING SUMMER AUTUMN">
+                <closedTexts winter="$l10n_message_closedForWinter"/>  <!-- Example: Closed for Winter cleaning -->
+            </activeSeasons>
+
+            <!-- Options: 0 to 23
+                 NOTE: activeSeasons' will always take priority even when the active hours are valid.
+                       When 'displayHours' is TRUE the operating hours will be displayed in the info box when a player is in the trigger.
+            -->
+            <activeHours startTime="8" endTime="20" displayHours="true"/>
+        </operatingConditions>
+
+        <productions sharedThroughputCapacity="true">
+            <!-- When 'autoOff' is true the production will shutdown when an input is full or an output is empty. -->
+            <production autoOff="false" costsPerActiveHour="60" costsPerActiveMinute="1" costsPerActiveMonth="1440" cyclesPerHour="60" cyclesPerMinute="1" cyclesPerMonth="1440" id="string" name="unnamed production" params="string">
+                <inputs>
+                    <input amount="1" fillType="string">
+                        <!-- Display Types:
+                            fillLevel = The current fill level of the input
+                            percent = The current percentage of fill level in the input
+                            capacity = The current capacity of the input
+                            title = The name of the fill type. The usage of 'hiddenColor' should not be used for this display or a '0' will be displayed instead of a 'space'.
+                                    'AUTO_MASK' can be used in 'mask' area for 'title' display so it adjust to text length
+                                    'upperCase' can be used if all capital letters is required
+                                    'mask' can be split using '|' so that $l10n_ entries can be added. (Example: mask="00000|$l10n_unit_liter" would display as '10000 Litres') (If using 'upperCase' then LITRES would be shown)... 'AUTO_MASK' is not supported when splitting with |
+
+                                    NOTE: Not all characters are available in the base game 'FONTS' such as special characters used in some languages.
+                                          If required you will need to first create your own custom 'FONT' or these will be displayed as blank spaces!
+                        -->
+                        <displays>
+                            <display alignment="string" color="0.9 0.9 0.9 1" emissiveScale="0.2" fillLevelColorType="NONE" font="string" hiddenColor="r g b" mask="0000000" node="node" scaleX="1" scaleY="1" size="0.03" type="string" upperCase="false"/>
+                        </displays>
+
+                        <!-- This is the same as the 'dynamicFillPlane' available under storage however this correctly updates when fillLevel changes and there is no limit on number added. -->
+                        <dynamicFillPlanes>
+                            <dynamicFillPlane allSidePlanes="true" changeColor="false" maxAllowedHeapAngle="35" maxDelta="1" maxSubDivEdgeLength="0.9" maxSurfaceDistanceError="0.05" node="node" retessellateTop="false" syncMaxSubDivEdgeLength="1.35"/>
+                        </dynamicFillPlanes>
+
+                        <!-- This is the same as the 'FillPlane' available under storage however there is no limit on number you may add and scale (y) is also an option now. -->
+                        <fillMovers>
+                            <fillMover node="node" changeVisibility="boolean" colorChange="false" minY="float" maxY="float" minRotX="angle" maxRotX="angle" minScaleY="float" maxScaleY="float"/>
+                        </fillMovers>
+
+                        <!-- Visibility node groups containing nodes that are shown and hidden based on fill level. Collisions will also be switched.
+                            Note: If there is a child node that also has collision then it can be referenced with user attribute 'childCollision' in the I3D so it is also switched. -->
+                        <visibilityNodeGroups>
+                            <visibilityNodeGroup node="node"/>
+                        </visibilityNodeGroups>
+
+                        <!-- Visibility nodes that use animation clips. Collisions are not supported on animals in V1.0.0.0.
+                            Note: 'clipNames' allows a random clip to be played each time it becomes visible however only one is required.
+                                'characterFilename' This is the mesh I3D to be loaded and attached it can include animations if required.
+                                'animationFilename' This is an optional shared animation I3D that will be cloned and attached to the mesh.
+                                'skeletonNode' This is the index of the skeleton containing the clips. This will be the I3D loaded from 'characterFilename' unless 'animationFilename' is given.
+                        -->
+                        <animatedVisibilityNodes>
+                            <visibilityNode animationFilename="string" characterFilename="string" clipNames="string" clipTrack="0" dirtFactor="Optional when using shader changes required" linkNode="node" meshNode="Parent node (TG or Shape) containing shapes with shader (Optional)" numTilesU="2" numTilesV="2" randomStart="true" skeletonNode="node" tileU="integer" tileV="integer"/>
+                        </animatedVisibilityNodes>
+                    </input>
+                </inputs>
+
+                <outputs>
+                    <!-- No features available when 'sellDirectly = true' -->
+                    <output amount="1" fillType="string" sellDirectly="false">
+                        <!-- Display Types:
+                            fillLevel = The current fill level of the input
+                            percent = The current percentage of fill level in the input
+                            capacity = The current capacity of the input
+                            title = The name of the fill type. The usage of 'hiddenColor' should not be used for this display or a '0' will be displayed instead of a 'space'.
+                                    'AUTO_MASK' can be used in 'mask' area for 'title' display so it adjust to text length
+                                    'upperCase' can be used if all capital letters is required
+
+                                    NOTE: Not all characters are available in the base game 'FONTS' such as special characters used in some languages.
+                                          If required you will need to first create your own custom 'FONT' or these will be displayed as blank spaces!
+                            -->
+                        <displays>
+                            <display alignment="string" color="0.9 0.9 0.9 1" emissiveScale="0.2" fillLevelColorType="NONE" font="string" hiddenColor="r g b" mask="0000000" node="node" scaleX="1" scaleY="1" size="0.03" type="string" upperCase="false"/>
+                        </displays>
+
+                        <!-- Object changes based on the current distribution setting -->
+                        <distributionObjectChanges>
+                            <autoDeliver>
+                                <objectChange node="node" rigidBodyTypeActive="string" rigidBodyTypeInactive="string" rotationActive="x y z" rotationInactive="x y z" scaleActive="x y z" scaleInactive="x y z" shaderParameter="string" shaderParameterActive="x y z w" shaderParameterInactive="x y z w" sharedShaderParameter="false" translationActive="x y z" translationInactive="x y z" visibilityActive="boolean" visibilityInactive="boolean"/>
+                            </autoDeliver>
+
+                            <directSell>
+                                <objectChange node="node" rigidBodyTypeActive="string" rigidBodyTypeInactive="string" rotationActive="x y z" rotationInactive="x y z" scaleActive="x y z" scaleInactive="x y z" shaderParameter="string" shaderParameterActive="x y z w" shaderParameterInactive="x y z w" sharedShaderParameter="false" translationActive="x y z" translationInactive="x y z" visibilityActive="boolean" visibilityInactive="boolean"/>
+                            </directSell>
+
+                            <keep>
+                                <objectChange node="node" rigidBodyTypeActive="string" rigidBodyTypeInactive="string" rotationActive="x y z" rotationInactive="x y z" scaleActive="x y z" scaleInactive="x y z" shaderParameter="string" shaderParameterActive="x y z w" shaderParameterInactive="x y z w" sharedShaderParameter="false" translationActive="x y z" translationInactive="x y z" visibilityActive="boolean" visibilityInactive="boolean"/>
+                            </keep>
+                        </distributionObjectChanges>
+
+                        <!-- This is the same as the 'dynamicFillPlane' available under storage however this correctly updates when fillLevel changes and there is no limit -->
+                        <dynamicFillPlanes>
+                            <dynamicFillPlane allSidePlanes="true" changeColor="false" maxAllowedHeapAngle="35" maxDelta="1" maxSubDivEdgeLength="0.9" maxSurfaceDistanceError="0.05" node="node" retessellateTop="false" syncMaxSubDivEdgeLength="1.35"/>
+                        </dynamicFillPlanes>
+
+                        <!-- This is the same as the 'FillPlane' available under storage however there is no limit and scale (y) is also an option -->
+                        <fillMovers>
+                            <fillMover node="node" changeVisibility="boolean" colorChange="false" minY="float" maxY="float" minRotX="angle" maxRotX="angle" minScaleY="float" maxScaleY="float"/>
+                        </fillMovers>
+
+                        <!-- Visibility node groups containing nodes that are shown and hidden based on fill level. Collisions will also be switched.
+                            Note: If there is a child node that also has collision then it can be referenced with user attribute 'childCollision' in the I3D so it is also switched. -->
+                        <visibilityNodeGroups>
+                            <visibilityNodeGroup node="node"/>
+                        </visibilityNodeGroups>
+                    </output>
+                </outputs>
+
+                <!-- Player trigger to toggle the production state on / off. Optional 'menuAction' allows a keybinding to be added that will open the UI -->
+                <playerTrigger menuAction="string" node="node"/>
+
+                <!-- Text displays to show the fill type name as displayed in UI. 'AUTO_MASK' can be used in 'mask' area so it adjust to text length
+                    'upperCase' can be used if all capital letters is required
+
+                     NOTE: Not all characters are available in the base game 'FONTS' such as special characters used in some languages.
+                           If required you will need to first create your own custom 'FONT' or these will be displayed as blank spaces!
+                -->
+                <nameDisplays>
+                    <display alignment="string" color="0.9 0.9 0.9 1" emissiveScale="0.2" font="string" hiddenColor="r g b" mask="0000000" node="node" scaleX="1" scaleY="1" size="0.03" upperCase="false"/>
+                </nameDisplays>
+
+                <!-- Object changes updated when production is active or inactive -->
+                <operatingObjectChanges>
+                    <objectChange node="node" rigidBodyTypeActive="string" rigidBodyTypeInactive="string" rotationActive="x y z" rotationInactive="x y z" scaleActive="x y z" scaleInactive="x y z" shaderParameter="string" shaderParameterActive="x y z w" shaderParameterInactive="x y z w" sharedShaderParameter="false" translationActive="x y z" translationInactive="x y z" visibilityActive="boolean" visibilityInactive="boolean"/>
+                </operatingObjectChanges>
+
+                <!-- Extra operating sounds allow for start, stop and working samples -->
+                <operatingSounds>
+                    <start debug="false" fadeIn="0" fadeOut="0" file="string" innerRadius="80" isLocalSound="false" linkNode="node" linkNodeOffset="x y z" loops="1" loopSynthesisRPMRatio="1" lowpassGainScale="1" outerRadius="5" parent="string" pitchScale="1" supportsReverb="true" template="string" volumeScale="1">
+                        <lowpassCutoffFrequency indoor="5000" outdoor="5000"/>
+                        <lowpassGain indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </lowpassGain>
+                        <lowpassResonance indoor="2" outdoor="2"/>
+                        <pitch indoor="1" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </pitch>
+                        <randomization isInside="true" isOutside="true" maxLowpassGain="float" maxPitch="float" maxVolume="float" minLowpassGain="float" minPitch="float" minVolume="float"/>
+                        <sourceRandomization file="string"/>
+                        <volume indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </volume>
+                    </start>
+
+                    <stop debug="false" fadeIn="0" fadeOut="0" file="string" innerRadius="80" isLocalSound="false" linkNode="node" linkNodeOffset="x y z" loops="1" loopSynthesisRPMRatio="1" lowpassGainScale="1" outerRadius="5" parent="string" pitchScale="1" supportsReverb="true" template="string" volumeScale="1">
+                        <lowpassCutoffFrequency indoor="5000" outdoor="5000"/>
+                        <lowpassGain indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </lowpassGain>
+                        <lowpassResonance indoor="2" outdoor="2"/>
+                        <pitch indoor="1" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </pitch>
+                        <randomization isInside="true" isOutside="true" maxLowpassGain="float" maxPitch="float" maxVolume="float" minLowpassGain="float" minPitch="float" minVolume="float"/>
+                        <sourceRandomization file="string"/>
+                        <volume indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </volume>
+                    </stop>
+
+                    <work debug="false" fadeIn="0" fadeOut="0" file="string" innerRadius="80" isLocalSound="false" linkNode="node" linkNodeOffset="x y z" loops="1" loopSynthesisRPMRatio="1" lowpassGainScale="1" outerRadius="5" parent="string" pitchScale="1" supportsReverb="true" template="string" volumeScale="1">
+                        <lowpassCutoffFrequency indoor="5000" outdoor="5000"/>
+                        <lowpassGain indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </lowpassGain>
+                        <lowpassResonance indoor="2" outdoor="2"/>
+                        <pitch indoor="1" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </pitch>
+                        <randomization isInside="true" isOutside="true" maxLowpassGain="float" maxPitch="float" maxVolume="float" minLowpassGain="float" minPitch="float" minVolume="float"/>
+                        <sourceRandomization file="string"/>
+                        <volume indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </volume>
+                    </work>
+                </operatingSounds>
+
+                <!-- All effect classes supported plus the following that allow on / off sequence times as an option.
+                     All custom effect classes have the normal options available for the non-sequenced version
+
+                    'SequencedParticleEffect' Can be used with shared particle effects or an emitter directly in the mod i3d
+
+                    NOTE: The relevant lua file must also be included. These are available at the GtX GitHub
+                          https://github.com/GtX-Andy/FS25_AnimationNodes
+                -->
+                <effectNodes>
+                    <effectNode effectNode="node" effectClass="SequencedPipeEffect"        materialType="UNLOADING" startDelay="3.5" sequenceOnTime="9.5" sequenceOffTime="6.5" />
+                    <effectNode effectNode="node" effectClass="SequencedParticleEffect"      dynamicFillType="false" defaultFillType="string" materialType="unloadingParticle" delay="3" sequenceOnTime="7" sequenceOffTime="9"/>
+                    <effectNode effectNode="node" effectClass="SequencedMorphPositionEffect" dynamicFillType="false" defaultFillType="string" materialType="belt"              delay="0" fadeTime="3" speed="0.9" scrollLength="5" scrollSpeed="0.8" sequenceOnTime="7" sequenceOffTime="9"/>
+                    <effectNode effectNode="node" effectClass="SequencedShaderPlaneEffect" materialType="unloadingSmoke" fadeTime="0.5" startDelay="3.5" sequenceOnTime="9.5" sequenceOffTime="6.5"/>
+                </effectNodes>
+
+                <!-- NOTE: The relevant lua file must also be included to use 'BeaconLightAnimation' and 'AnimatedPartAnimation'. These are available at the GtX GitHub
+                           https://github.com/GtX-Andy/FS25_EffectNodes
+                -->
+                <animationNodes>
+                    <!-- USAGE: Load a beacon light in the same way as a vehicle, dynamic or part of mod -->
+                    <animationNode node="node" class="BeaconLightAnimation" filename="$data/shared/assets/beaconLights/lizard/beaconLight10.xml" />
+
+                    <!-- USAGE: Mesh and clip part of mod -->
+                    <animationNode class="AnimatedPartAnimation" >
+                        <clip node="skeletonNode" name="Animation Name" looping="true"/>
+                    </animationNode>
+
+                    <!-- USAGE: Mesh part of mod with shared animation file -->
+                    <animationNode class="AnimatedPartAnimation" >
+                        <clip node="link / mesh node" animationFilename="sharedAnimation.i3d" name="animationName" looping="true"/>
+                    </animationNode>
+
+                    <!-- USAGE: Shared mesh and animation files -->
+                    <animationNode class="AnimatedPartAnimation" >
+                        <clip node="linkNode" characterFilename="baker/baker.i3d" animationFilename="baker/animations/bakerAnimations.i3d" skeletonNode="0|0" name="mixingBowl" looping="true"/>
+                    </animationNode>
+
+                    <!-- USAGE: Shared mesh with combined clip file -->
+                    <animationNode class="AnimatedPartAnimation" >
+                        <clip node="linkNode" characterFilename="dog/guardDogAnimations.i3d" skeletonNode="0|0" name="sittingSource" looping="true"/>
+                    </animationNode>
+
+                    <!-- USAGE: Similar to animated object but allows on / off sequence times -->
+                    <animationNode class="AnimatedPartAnimation" sequenceOnTime="10" sequenceOffTime="6">
+                        <animation duration="3">
+                            <part node="node">
+                                <keyFrame time="0.0" rotation="0 0 0"/>
+                                <keyFrame time="1.0" rotation="0 180 0"/>
+                            </part>
+                            <part node="node">
+                                <keyFrame time="0.0" translation="7.9 1.19 -3.36"/>
+                                <keyFrame time="1.0" translation="7.9 3 -3.36"/>
+                            </part>
+                        </animation>
+                    </animationNode>
+
+                    <!-- USAGE: Just like animated object, sounds can be used for moving, start and end -->
+                    <animationNode class="AnimatedPartAnimation">
+                        <animation duration="0.2">
+                            <part node="node">
+                                <keyFrame time="0.0" rotation="0 0 0"/>
+                                <keyFrame time="1.0" rotation="-80 0 0"/>
+                            </part>
+                        </animation>
+
+                        <sounds>
+                            <posEnd file="filename.ogg" linkNode="node" volume="0.8" radius="25" innerRadius="3" />
+                            <negEnd file="filename.ogg" linkNode="node" volume="0.8" radius="25" innerRadius="3" />
+                        </sounds>
+                    </animationNode>
+                </animationNodes>
+
+                <!-- Active sound just as in standard 'ProductionPoint' -->
+                <sounds>
+                    <active debug="false" fadeIn="0" fadeOut="0" file="string" innerRadius="80" isLocalSound="false" linkNode="node" linkNodeOffset="x y z" loops="1" loopSynthesisRPMRatio="1" lowpassGainScale="1" outerRadius="5" parent="string" pitchScale="1" supportsReverb="true" template="string" volumeScale="1">
+                        <lowpassCutoffFrequency indoor="5000" outdoor="5000"/>
+                        <lowpassGain indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </lowpassGain>
+                        <lowpassResonance indoor="2" outdoor="2"/>
+                        <pitch indoor="1" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </pitch>
+                        <randomization isInside="true" isOutside="true" maxLowpassGain="float" maxPitch="float" maxVolume="float" minLowpassGain="float" minPitch="float" minVolume="float"/>
+                        <sourceRandomization file="string"/>
+                        <volume indoor="0.8" outdoor="1">
+                            <modifier modifiedValue="float" type="string" value="float"/>
+                        </volume>
+                    </active>
+                </sounds>
+            </production>
+        </productions>
+
+        <!-- Just as in standard 'ProductionPoint'. Sequenced animation classes can also be used here. -->
+        <animationNodes>
+        </animationNodes>
+
+        <!-- Just as in standard 'ProductionPoint'. Sequenced effect classes can also be used here. -->
+        <effectNodes defaultFillType="string" dynamicFillType="false">
+        </effectNodes>
+
+        <!-- No changes -->
+        <loadingStation fillTypeCategories="string" fillTypes="string" node="node" stationName="LoadingStation" storageRadius="50" supportsExtension="false">
+        </loadingStation>
+
+        <!-- Optional: This extended loading station provides all base features but also allows you to include a player trigger for interaction when on foot and also the ability to use <objectChange> if required.
+                       ExtendedLoadingStation.lua is available at https://github.com/GtX-Andy/FS25_ExtendedProductionPoint/blob/main/ExtendedLoadingStation.lua
+
+                       When using <extendedLoadingStation> the default <loadingStation> will no longer operate
+        -->
+        <extendedLoadingStation>
+            <loadTrigger triggerNode="triggerNode" fillTypes="string">
+                <playerTrigger node="loadTriggerPlayer" externalActivation="false"/>  <!-- When externalActivation="true" it is only possible to start filling from outside a vehicle. -->
+
+                <!-- Optional: This can be a handle operation or shader etc just like a standard 'objectChange'.  -->
+                <objectChange node="node" rigidBodyTypeActive="string" rigidBodyTypeInactive="string" rotationActive="x y z" rotationInactive="x y z" scaleActive="x y z" scaleInactive="x y z" shaderParameter="string" shaderParameterActive="x y z w" shaderParameterInactive="x y z w" sharedShaderParameter="false" translationActive="x y z" translationInactive="x y z" visibilityActive="boolean" visibilityInactive="boolean"/>
+            </loadTrigger>
+        </extendedLoadingStation>
+
+        <!-- No changes -->
+        <palletSpawner node="node">
+        </palletSpawner>
+
+        <!-- No changes -->
+        <sellingStation allowMissions="true" appearsOnStats="false" fillTypeCategories="string" fillTypes="string" fullPriceRecoverHours="float" hasDynamic="true" hideFromPricesMenu="false" node="node" stationName="LoadingStation" storageRadius="50" supportsExtension="false" suppressWarnings="false">
+        </sellingStation>
+
+        <!-- No changes -->
+        <sounds>
+            <active debug="false" fadeIn="0" fadeOut="0" file="string" innerRadius="80" isLocalSound="false" linkNode="node" linkNodeOffset="x y z" loops="1" loopSynthesisRPMRatio="1" lowpassGainScale="1" outerRadius="5" parent="string" pitchScale="1" supportsReverb="true" template="string" volumeScale="1">
+                <lowpassCutoffFrequency indoor="5000" outdoor="5000"/>
+                <lowpassGain indoor="0.8" outdoor="1">
+                    <modifier modifiedValue="float" type="string" value="float"/>
+                </lowpassGain>
+                <lowpassResonance indoor="2" outdoor="2"/>
+                <pitch indoor="1" outdoor="1">
+                    <modifier modifiedValue="float" type="string" value="float"/>
+                </pitch>
+                <randomization isInside="true" isOutside="true" maxLowpassGain="float" maxPitch="float" maxVolume="float" minLowpassGain="float" minPitch="float" minVolume="float"/>
+                <sourceRandomization file="string"/>
+                <volume indoor="0.8" outdoor="1">
+                    <modifier modifiedValue="float" type="string" value="float"/>
+                </volume>
+            </active>
+
+            <idle debug="false" fadeIn="0" fadeOut="0" file="string" innerRadius="80" isLocalSound="false" linkNode="node" linkNodeOffset="x y z" loops="1" loopSynthesisRPMRatio="1" lowpassGainScale="1" outerRadius="5" parent="string" pitchScale="1" supportsReverb="true" template="string" volumeScale="1">
+                <lowpassCutoffFrequency indoor="5000" outdoor="5000"/>
+                <lowpassGain indoor="0.8" outdoor="1">
+                    <modifier modifiedValue="float" type="string" value="float"/>
+                </lowpassGain>
+                <lowpassResonance indoor="2" outdoor="2"/>
+                <pitch indoor="1" outdoor="1">
+                    <modifier modifiedValue="float" type="string" value="float"/>
+                </pitch>
+                <randomization isInside="true" isOutside="true" maxLowpassGain="float" maxPitch="float" maxVolume="float" minLowpassGain="float" minPitch="float" minVolume="float"/>
+                <sourceRandomization file="string"/>
+                <volume indoor="0.8" outdoor="1">
+                    <modifier modifiedValue="float" type="string" value="float"/>
+                </volume>
+            </idle>
+        </sounds>
+
+        <!-- No changes -->
+        <storage capacity="100000" costsPerFillLevelAndDay="0" fillLevelSyncThreshold="1" fillTypeCategories="string" fillTypes="string" isExtension="boolean" node="node" supportsMultipleFillTypes="true">
+            <capacity capacity="float" fillType="string"/>
+            <dynamicFillPlane allSidePlanes="true" changeColor="false" defaultFillType="string" maxAllowedHeapAngle="35" maxDelta="1" maxSubDivEdgeLength="0.9" maxSurfaceDistanceError="0.05" node="node" retessellateTop="false" syncMaxSubDivEdgeLength="1.35"/>
+            <fillPlane changeVisibility="boolean" colorChange="false" fillType="string" maxRotX="angle" maxY="float" minRotX="angle" minY="float" node="node"/>
+            <startFillLevel fillLevel="float" fillType="string"/>
+        </storage>
+    </extendedProductionPoint>
+</placeable>
