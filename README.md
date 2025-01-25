@@ -1,6 +1,6 @@
 # Extended Production Point for Farming Simulator 25
 
-`Farming Simulator  25`&nbsp;&nbsp;&nbsp;&nbsp;`Revision:  FS25-01`&nbsp;&nbsp;&nbsp;&nbsp;`Game Version:  1.4.0.0`
+`Farming Simulator  25`&nbsp;&nbsp;&nbsp;&nbsp;`Revision:  FS25-02`&nbsp;&nbsp;&nbsp;&nbsp;`Game Version:  1.4.0.0`
 
 ## About
 Farming Simulator 25 placeable production specialisation that includes an extended feature set.

@@ -3,7 +3,7 @@ Copyright (C) GtX (Andy), 2022
 
 Author: GtX | Andy
 Date: 14.02.2022
-Revision: FS25-01
+Revision: FS25-02
 
 Contact:
 https://forum.giants-software.com
@@ -1439,7 +1439,7 @@ function ExtendedProductionPoint:loadDynamicFillPlanes(xmlFile, key, components,
             local dynamicFillPlane = FillPlaneUtil.createFromXML(xmlFile, dynamicFillPlaneKey, node, self.storage:getCapacity(fillTypeIndex))
 
             if dynamicFillPlane ~= nil then
-                FillPlaneUtil.assignDefaultMaterials(dynamicFillPlane)
+                FillPlaneUtil.assignDefaultMaterialsFromTerrain(dynamicFillPlane, g_terrainNode)
                 FillPlaneUtil.setFillType(dynamicFillPlane, fillTypeIndex)
 
                 if dynamicFillPlanes == nil then
