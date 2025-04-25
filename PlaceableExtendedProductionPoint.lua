@@ -3,7 +3,7 @@ Copyright (C) GtX (Andy), 2022
 
 Author: GtX | Andy
 Date: 14.02.2022
-Revision: FS25-02
+Revision: FS25-03
 
 Contact:
 https://forum.giants-software.com
@@ -1933,7 +1933,7 @@ function ExtendedProductionPoint:setProductionStatus(productionId, status, noEve
                 self:setProductionState(productionId, false)
 
                 production.status = status
-                ProductionPointProductionStatusEvent.sendEvent(self, productionId, status, noEventSend)
+                ProductionPointProductionStatusEvent.sendEvent(self, production.index, status, noEventSend) -- Event uses a new index in FS25 not a string ID
 
                 return
             end
