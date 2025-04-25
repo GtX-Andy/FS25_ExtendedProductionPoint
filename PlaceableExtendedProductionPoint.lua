@@ -3,7 +3,7 @@ Copyright (C) GtX (Andy), 2022
 
 Author: GtX | Andy
 Date: 14.02.2022
-Revision: FS25-03
+Revision: FS25-04
 
 Contact:
 https://forum.giants-software.com
@@ -2310,7 +2310,7 @@ function AnimalScreenTrailerExtendedProduction:applySource(animalTypeIndex, anim
                         if self.animalMinimumAgeText == nil then
                             self.errorCallback(string.format("%s\nMinimum %s: %s", g_i18n:getText("shop_messageAnimalTypeNotSupported"), g_i18n:getText("ui_age"), g_i18n:formatNumMonth(minimumAge)))
                         else
-                            self.errorCallback(string.format(self.animalMinimumAgeText), minimumAge)
+                            self.errorCallback(string.format(self.animalMinimumAgeText, minimumAge))
                         end
 
                         return false
@@ -2318,7 +2318,7 @@ function AnimalScreenTrailerExtendedProduction:applySource(animalTypeIndex, anim
                         if self.animalMaximumAgeText == nil then
                             self.errorCallback(string.format("%s\nMaximum %s: %s", g_i18n:getText("shop_messageAnimalTypeNotSupported"), g_i18n:getText("ui_age"), g_i18n:formatNumMonth(maximumAge)))
                         else
-                            self.errorCallback(string.format(self.animalMaximumAgeText), maximumAge)
+                            self.errorCallback(string.format(self.animalMaximumAgeText, maximumAge))
                         end
 
                         return false
